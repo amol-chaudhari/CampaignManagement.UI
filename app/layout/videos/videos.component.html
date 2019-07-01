@@ -1,0 +1,70 @@
+<div [@routerTransition]>
+    <h2 class="text-muted">Videos</h2>
+    <hr>
+    <div class="row">
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Video Name</th>
+                        <th>File Name</th>
+                        <th>Video Length</th>
+                        <th>Active</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let video of videos">
+                        <td>{{video.VideoName}}</td>
+                        <td>{{video.FileName}}</td>
+                        <td>{{video.VideoLength}}</td>
+                        <td>{{video.Active ? 'Yes' : 'No'}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" (click)="editVideo(video.VideoId, content)">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary" (click)="addVideo(content)">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #content let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Video Details</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #videoForm="ngForm" (ngSubmit)="OnSubmit(videoForm)">
+        <div class="modal-body">
+            <fieldset class="form-group">
+                <label for="video-input" class="form-control-label">Video Name</label>
+                <input class="form-control" type="text" name="VideoName" [(ngModel)]="video.VideoName" required>
+            </fieldset>
+            <fieldset class="form-group" *ngIf="video.VideoId == 0">
+                <label for="file">Choose File</label>
+                <input type="file" class="form-control-file" id="file" (change)="handleFileInput($event.target.files)">
+            </fieldset>
+            <fieldset class="form-group" *ngIf="video.VideoId > 0">
+                <label for="filename-input" class="form-control-label">File Name</label>
+                <p class="form-control-static">{{video.FileName}}</p>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="videolength-input" class="form-control-label">Video Length</label>
+                <input class="form-control" type="text" name="VideoLength" [(ngModel)]="video.VideoLength" [disabled]="video.VideoId > 0" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label class="checkbox-inline">
+                    Active&nbsp;<input type="checkbox" name="Active" [(ngModel)]="video.Active" [checked]="video.Active">
+                </label>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!videoForm.valid" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>

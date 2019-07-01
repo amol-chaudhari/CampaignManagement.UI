@@ -1,0 +1,100 @@
+<div [@routerTransition]>
+    <h2 class="text-muted">Inbox</h2>
+    <hr>
+    <div class="row">
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Campaign Name</th>
+                        <th>Reference No</th>
+                        <th>Category</th>
+                        <th>Level</th>
+                        <th>Video Details</th>
+                        <th>Assigned By</th>
+                        <th>Received Date</th>
+                        <th>Completed Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let userCampaign of userCampaigns">
+                        <td>{{userCampaign.Campaign.CampaignName}}</td>
+                        <td>{{userCampaign.Campaign.ReferenceId}}</td>
+                        <td>{{userCampaign.Campaign.Category}}</td>
+                        <td>{{userCampaign.Campaign.Level}}</td>
+                        <td>{{getVideoName(userCampaign.Campaign.VideoLink)}}</td>
+                        <td>{{userCampaign.Campaign.PublishedBy}}</td>
+                        <td>{{userCampaign.Campaign.PublishedDate}}</td>
+                        <td>{{userCampaign.CompletedDate}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" (click)="viewCampaign(userCampaign.UserCampaignId, content)" [disabled]="userCampaign.CompletedDate != ''">View</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<ng-template #content let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Campaign Details</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #inboxForm="ngForm" (ngSubmit)="OnSubmit(inboxForm)">
+        <div class="modal-body">
+            <div *ngIf="!enableSurvey" class="content video">
+                <!-- <mat-video #campaignVideo [preload]="true" [fullscreen]="true" 
+                            [download]="false" [spinner]="spin" [overlay]="null" 
+                            [quality]="true" [loop]="false" [autoplay]="false" (ended)="onVideoEnded()">
+                    <source matVideoSource [src]="videoSource" type="video/mp4">
+                </mat-video> -->
+                <video preload="true" quality="true" keyboard="true" fullscreen="true" 
+                       spinner="spin" width="90%" height="auto"
+                       oncontextmenu="return false;" disablePictureInPicture 
+                       controls controlsList="nodownload" on-play="onVideoStarted()" on-ended="onVideoEnded()">
+                    <source [src]="videoSource" type="video/mp4">
+                </video>
+            </div>
+            <div *ngIf="enableSurvey">
+                <div *ngFor="let question of survey.SurveyQuestions; let i = index">
+                    <fieldset class="form-group">
+                        <label for="question-input" class="form-control-label"><strong>Question + {{i + 1}}</strong></label>
+                        <p class="form-control-static">{{question.Description}}</p>
+                    </fieldset>
+                    <label class="checkbox-inline">
+                        Skip&nbsp;<input type="checkbox" name="Skipped" [(ngModel)]="question.Skipped">
+                    </label>
+                    <fieldset class="form-group">
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="radioChoices" id="choice1" [value]="question.Choice1" (click)="selectAnswer(question.Choice1, i)">{{question.Choice1}}
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="radioChoices" id="choice2" [value]="question.Choice2" (click)="selectAnswer(question.Choice2, i)">{{question.Choice2}}
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="radioChoices" id="choice3" [value]="question.Choice3" (click)="selectAnswer(question.Choice3, i)">{{question.Choice3}}
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="radioChoices" id="choice4" [value]="question.Choice4" (click)="selectAnswer(question.Choice4, i)">{{question.Choice4}}
+                            </label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!enableSurveySubmit" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Submit</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>

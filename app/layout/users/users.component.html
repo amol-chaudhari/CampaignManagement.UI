@@ -1,0 +1,102 @@
+<div [@routerTransition]>
+    <h2 class="text-muted">Users</h2>
+    <hr>
+    <div class="row">
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users">
+                        <td>{{user.FirstName}}</td>
+                        <td>{{user.LastName}}</td>
+                        <td>{{user.UserName}}</td>
+                        <td>{{user.Email}}</td>
+                        <td>{{user.Department}}</td>
+                        <td>{{getRoleName(user.RoleId)}}</td>
+                        <td>{{user.Active ? 'Yes' : 'No'}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" (click)="editUser(user.UserId, content)">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary" (click)="addUser(content)">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #content let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">User Details</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #userForm="ngForm" (ngSubmit)="OnSubmit(userForm)">
+        <div class="modal-body" *ngIf="isVisible">
+            <fieldset class="form-group">
+                <label for="firstname-input" class="form-control-label">First Name</label>
+                <input class="form-control" type="text" name="FirstName" [(ngModel)]="user.FirstName" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="lastname-input" class="form-control-label">Last Name</label>
+                <input class="form-control" type="text" name="LastName" [(ngModel)]="user.LastName" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="username-input" class="form-control-label">User Name</label>
+                <input class="form-control" type="text" name="UserName" [(ngModel)]="user.UserName" [disabled]="user.UserId > 0" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="email-input" class="form-control-label">Email</label>
+                <input class="form-control" type="text" name="Email" [(ngModel)]="user.Email" [pattern]="emailPattern" disabled]="user.UserId > 0" required>
+            </fieldset>
+            <fieldset class="form-group" *ngIf="user.UserId == 0">
+                <label for="password-input" class="form-control-label">Password</label>
+                <input class="form-control" type="password" name="Password" [(ngModel)]="user.Password" minlength="6" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="department-input" class="form-control-label">Department</label>
+                <input class="form-control" type="text" name="Department" [(ngModel)]="user.Department">
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="role-input" class="form-control-label">Role</label>
+                <select class="form-control" (change)='onOptionsChanged($event.target.value)'>
+                    <option value="0">Select Role</option>
+                    <option *ngFor="let x of roles" [value]="x.Id" selected="x.Id == user.RoleId">
+                        {{x.Name}}
+                    </option>
+                </select>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="group-input" class="form-control-label">Group</label>
+                <select class="form-control" (change)='onGroupOptionsChanged($event.target.value)'>
+                    <option value="0">Select Group</option>
+                    <option *ngFor="let x of groups" [value]="x.GroupId" selected="x.GroupId == user.GroupId">
+                        {{x.GroupName}}
+                    </option>
+                </select>
+            </fieldset>
+            <fieldset class="form-group">
+                <label class="checkbox-inline">
+                    Active&nbsp;<input type="checkbox" name="Active" [(ngModel)]="user.Active" [checked]="user.Active">
+                </label>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!userForm.valid" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>

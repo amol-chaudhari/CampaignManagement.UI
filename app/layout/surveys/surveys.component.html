@@ -1,0 +1,155 @@
+<div [@routerTransition]>
+    <h2 class="text-muted">Surveys</h2>
+    <hr>
+    <div class="row">
+        <div class="col-xl-3 text-right">
+            Campaigns
+        </div>
+        <div class="col-xl-9 text-left">
+            <div class="dropdown theme-dropdown clearfix ">
+                <select class="form-control" (change)="loadSurvey($event.target.value)" ngbDropdown>
+                    <option value="0" ngbDropdown>Select Campaign</option>
+                    <option *ngFor="let x of campaigns" [value]="x.CampaignId" ngbDropdown>
+                        {{x.CampaignName}}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12" *ngIf="selectedCampaign > 0">
+            <div class="card mb-3">
+                <div class="card-header">Details</div>
+                <div class="card-body">
+                    <form #surveyForm="ngForm" (ngSubmit)="OnSubmit(surveyForm)">
+                        <div class="row">
+                            <div class="col-xl-3 text-right">
+                                <label for="survey-input" class="form-control-label">Survey Name</label>
+                            </div>
+                            <div class="col-xl-9 text-left">
+                                <input class="form-control" type="text" name="SurveyName" [(ngModel)]="survey.SurveyName" [disabled]="survey.SurveyId > 0" required>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-xl-3 text-right">
+                                <label for="description-input" class="form-control-label">Description</label>
+                            </div>
+                            <div class="col-xl-9 text-left">
+                                <textarea class="form-control" rows="3" name="Description" [(ngModel)]="survey.Description" [disabled]="survey.SurveyId > 0" required></textarea>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-xl-3 text-right">
+                                <label for="validation-input" class="form-control-label">&nbsp;</label>
+                            </div>
+                            <div class="col-xl-9 text-left">
+                                <button [disabled]="!surveyForm.valid" type="submit" class="btn btn-success text-center">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row col-md-12" *ngIf="survey.SurveyId > 0">
+        <div class="card mb-3">
+            <div class="card-header">Questions</div>
+            <div class="card-body">
+                <div class="row">
+                    <div *ngIf='survey.SurveyQuestions && survey.SurveyQuestions.length == 0' class="alert alert-info">No question records found!</div>
+                </div>
+                <div class="row">
+                    <div class="card-body table-responsive">
+                        <div *ngIf='survey.SurveyQuestions && survey.SurveyQuestions.length'>
+                            <table class="table table-hover table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th>Choice 1</th>
+                                        <th>Choice 2</th>
+                                        <th>Choice 3</th>
+                                        <th>Choice 4</th>
+                                        <th>Answer</th>
+                                        <th>Active</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let question of survey.SurveyQuestions; let i = index">
+                                        <td>{{question.Description}}</td>
+                                        <td>{{question.Choice1}}</td>
+                                        <td>{{question.Choice2}}</td>
+                                        <td>{{question.Choice3}}</td>
+                                        <td>{{question.Choice4}}</td>
+                                        <td>{{question.Answer}}</td>
+                                        <td>{{question.Active ? 'Yes' : 'No'}}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-info" (click)="editQuestion(question.QuestionId, content, i)">Edit</button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-info" (click)="removeQuestion(question.QuestionId)">Remove</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary" (click)="addQuestion(content)">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Question Details</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #questionForm="ngForm" (ngSubmit)="OnQuestionSubmit(questionForm)">
+        <div class="modal-body">
+            <fieldset class="form-group">
+                <label for="question-input" class="form-control-label">Description</label>
+                <input class="form-control" type="text" name="questionDescription" [(ngModel)]="question.Description" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="choice1-input" class="form-control-label">Choice 1</label>
+                <input class="form-control" type="text" name="choice1" [(ngModel)]="question.Choice1" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="choice2-input" class="form-control-label">Choice 2</label>
+                <input class="form-control" type="text" name="choice2" [(ngModel)]="question.Choice2" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="choice3-input" class="form-control-label">Choice 3</label>
+                <input class="form-control" type="text" name="choice3" [(ngModel)]="question.Choice3" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="choice4-input" class="form-control-label">Choice 4</label>
+                <input class="form-control" type="text" name="choice4" [(ngModel)]="question.Choice4" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="answer-input" class="form-control-label">Answer</label>
+                <input class="form-control" type="text" name="answer" [(ngModel)]="question.Answer" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label class="checkbox-inline">
+                    Active&nbsp;<input type="checkbox" name="Active" [(ngModel)]="question.Active" [checked]="question.Active">
+                </label>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!questionForm.valid" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>

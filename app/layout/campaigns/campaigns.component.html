@@ -1,0 +1,134 @@
+<div [@routerTransition]>
+    <h2 class="text-muted">Campaigns</h2>
+    <hr>
+    <div class="row">
+        <div class="card-body table-responsive">
+            <table class="table table-hover table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Campaign Name</th>
+                        <th>Reference No</th>
+                        <th>Category</th>
+                        <th>Level</th>
+                        <th>Description</th>
+                        <th>VideoLink</th>
+                        <th>VideoDetails</th>
+                        <th>Active</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let campaign of campaigns">
+                        <td>{{campaign.CampaignName}}</td>
+                        <td>{{campaign.ReferenceId}}</td>
+                        <td>{{campaign.Category}}</td>
+                        <td>{{campaign.Level}}</td>
+                        <td>{{campaign.Description}}</td>
+                        <td>{{getVideoName(campaign.VideoLink)}}</td>
+                        <td>{{campaign.VideoDetails}}</td>
+                        <td>{{campaign.Active ? 'Yes' : 'No'}}</td>
+                        <td>
+                            <button type="button" class="btn btn-info" (click)="editCampaign(campaign.CampaignId, content)" [disabled]="campaign.PublishedDate != null">Edit</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-info" (click)="publishCampaign(campaign.CampaignId, publish)" [disabled]="campaign.PublishedDate != null">Publish</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary" (click)="addCampaign(content)">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #content let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Campaign Details</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #campaignForm="ngForm" (ngSubmit)="OnSubmit(campaignForm)">
+        <div class="modal-body" *ngIf="isVisible">
+            <fieldset class="form-group">
+                <label for="campaign-input" class="form-control-label">Campaign Name</label>
+                <input class="form-control" type="text" name="CampaignName" [(ngModel)]="campaign.CampaignName" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="description-input" class="form-control-label">Description</label>
+                <textarea class="form-control" rows="3" name="Description" [(ngModel)]="campaign.Description" required></textarea>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="referenceno-input" class="form-control-label">Reference No</label>
+                <input class="form-control" type="text" name="ReferenceNo" [(ngModel)]="campaign.ReferenceId" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="category-input" class="form-control-label">Category</label>
+                <input class="form-control" type="text" name="Category" [(ngModel)]="campaign.Category" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="level-input" class="form-control-label">Level</label>
+                <input class="form-control" type="text" name="Level" [(ngModel)]="campaign.Level" required>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="video-input" class="form-control-label">Video</label>
+                <select class="form-control" (change)='onOptionsChanged($event.target.value)'>
+                    <option value="0">Select Video</option>
+                    <option *ngFor="let x of videos" [value]="x.VideoId" selected="x.VideoId == campaign.VideoLink">
+                        {{x.VideoName}}
+                    </option>
+                </select>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="videodetails-input" class="form-control-label">Video Details</label>
+                <textarea class="form-control" rows="3" name="VideoDetails" [(ngModel)]="campaign.VideoDetails" required></textarea>
+            </fieldset>
+            <fieldset class="form-group">
+                <label class="checkbox-inline">
+                    Active&nbsp;<input type="checkbox" name="Active" [(ngModel)]="campaign.Active" [checked]="campaign.Active">
+                </label>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!campaignForm.valid" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #publish let-c="close" let-d="dismiss" let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">Publish Campaign</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #publishForm="ngForm" (ngSubmit)="OnPublishSubmit(publishForm)">
+        <div class="modal-body">
+            <fieldset class="form-group">
+                <label for="campaign-input" class="form-control-label">Campaign Name</label>
+                <p class="form-control-static">{{campaign.CampaignName}}</p>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="description-input" class="form-control-label">Description</label>
+                <p class="form-control-static">{{campaign.Description}}</p>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="group-input" class="form-control-label">Group</label>
+                <select class="form-control" (change)='onPublishOptionsChanged($event.target.value)'>
+                    <option value="0">Select Group</option>
+                    <option *ngFor="let x of groups" [value]="x.GroupId">
+                        {{x.GroupName}}
+                    </option>
+                </select>
+            </fieldset>
+        </div>
+        <div class="modal-footer">
+            <button [disabled]="!publishForm.valid" type="submit" class="btn btn-success" (click)="activeModal.dismiss('modal closed')">Save</button>
+            <button type="button" class="btn btn-secondary" (click)="c('Close click')">Cancel</button>
+        </div>
+    </form>
+</ng-template>
