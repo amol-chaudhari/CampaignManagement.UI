@@ -30,7 +30,10 @@ export class UserService {
 
   userAuthentication(userName, password) {
     var data = "username=" + userName + "&password=" + password + "&grant_type=password";
-    var reqHeader = new HttpHeaders({ 'Content-Type': 'application/x-www-urlencoded' });
+    var reqHeader = new HttpHeaders({ 'No-Auth':'True'});
+    //  reqHeader.append('Access-Control-Allow-Origin', '*');
+    reqHeader.append('Content-Type', 'application/x-www-urlencoded');
+    //  reqHeader.append("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
     return this.http.post(this.rootUrl + '/token', data, { headers: reqHeader });
   }
 
