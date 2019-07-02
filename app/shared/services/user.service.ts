@@ -11,8 +11,8 @@ export class UserService {
   readonly rootUrl = Global.BASE_USER_ENDPOINT;
   constructor(private http: HttpClient) { }
 
-  registerUser(user: User) {
-    const body: User = {
+  registerUser(user: User): Observable<User> {
+    const input: User = {
       UserId:  user.UserId,
       UserName: user.UserName,
       Password: user.Password,
@@ -24,21 +24,22 @@ export class UserService {
       Active: user.Active,
       Department: user.Department
     }
-    var reqHeader = new HttpHeaders({'No-Auth':'True'});
-    return this.http.post(this.rootUrl + '/api/User/Register', body,{headers : reqHeader});
+    let body = JSON.stringify(input);
+    const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
+    return this.http.post<User>(this.rootUrl + '/api/User/Register', body, httpOptions);
   }
 
-  userAuthentication(userName, password) {
+  userAuthentication(userName, password): Observable<any> {
     var data = "username=" + userName + "&password=" + password + "&grant_type=password";
     var reqHeader = new HttpHeaders({ 'No-Auth':'True'});
     //  reqHeader.append('Access-Control-Allow-Origin', '*');
     reqHeader.append('Content-Type', 'application/x-www-urlencoded');
     //  reqHeader.append("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
-    return this.http.post(this.rootUrl + '/token', data, { headers: reqHeader });
+    return this.http.post<any>(this.rootUrl + '/token', data, { headers: reqHeader });
   }
 
-  getUserClaims(){
-   return  this.http.get(this.rootUrl+'/api/GetUserClaims');
+  getUserClaims() : Observable<any>{
+   return  this.http.get<any>(this.rootUrl+'/api/GetUserClaims');
   }
 
   getAllUser(): Observable<User[]> {
