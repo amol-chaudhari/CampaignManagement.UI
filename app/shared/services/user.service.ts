@@ -38,8 +38,8 @@ export class UserService {
     return this.http.post<any>(this.rootUrl + '/token', data, { headers: reqHeader });
   }
 
-  getUserClaims() : Observable<any>{
-   return  this.http.get<any>(this.rootUrl+'/api/GetUserClaims');
+  getUserClaims(){
+   return  this.http.get(this.rootUrl+'/api/GetUserClaims');
   }
 
   getAllUser(): Observable<User[]> {
